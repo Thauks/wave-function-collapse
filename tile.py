@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 from PIL import Image
 from dataclasses import dataclass
 
@@ -44,6 +45,10 @@ class Tile():
         self.joints = self._calc_joints()
         print(len(self.joints))
         
+    def render(self, rotation_stage = 0):
+        im = Image.fromarray(np.rot90(self.array, rotation_stage, axes=[1,0]))
+        plt.imshow(im)
+        return im
         
     def _calc_joints(self):
         rgb2hex = lambda x: '%02x%02x%02x' %(x[0],x[1],x[2])
@@ -78,11 +83,11 @@ class Tileset():
         self.tiles = self._load_tiles(path)
 
     def _load_tiles(self, path):
-        tiles = []
+        tiles = {}
         raws = os.listdir(path)
         
         for t in raws:
             arr = np.asarray(Image.open(path+t))
-            tiles.append(Tile(t, arr))
+            tiles[t] = Tile(t, arr)
             
         return tiles
