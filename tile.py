@@ -43,11 +43,11 @@ class Tile():
         self.n_rotations = n_rotations
         self.array = array
         self.joints = self._calc_joints()
-        print(len(self.joints))
         
     def render(self, rotation_stage = 0):
         im = Image.fromarray(np.rot90(self.array, rotation_stage, axes=[1,0]))
         plt.imshow(im)
+        plt.show()
         return im
     
     def get_edges(self, rotation_stage):

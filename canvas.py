@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import matplotlib.pyplot as plt
 import random
 from dataclasses import dataclass
 
@@ -41,7 +42,22 @@ class Canvas():
         self.grid = self._gen_grid()
         
     def render(self):
-        pass
+        #TODO: DAMN i can't figure out how to render this
+        # rended = np.zeros((8, 8, 4))
+        
+        # for i, row in enumerate(self.grid):
+        #     for j, cell in enumerate(row):
+                
+        #         rended[:8, :8] = self.tileset.tiles[cell.tile].array
+        #         print(cell)
+        
+        # print (rended)
+        # im = Image.fromarray(rended)
+        # plt.imshow(im)
+        # plt.show()
+        
+    def is_finished(self):
+        return self.finished
     
     def collapse_cell(self, xcoord, ycoord):
         
@@ -55,7 +71,30 @@ class Canvas():
             cell.n_rotations = choice['joint'].rotation_stage
             cell.options = None
             self._propagate_collapse(cell)
-            cell.collapsed = True        
+            cell.collapsed = True
+            self.cells_left -= 1
+            if self.cells_left == 0: self.finished = True
+            print(f'Cell collapsed ({xcoord}, {ycoord}) with {cell.tile} rotation stage: {cell.n_rotations}')
+    
+    def find_candidate(self):
+        
+        minimum = np.inf
+        x, y = None, None
+        
+        for row in self.grid:
+            for cell in row:
+                if not cell.collapsed:
+                    n_opt = len(cell.options)
+                    if n_opt == 1:
+                        x, y = cell.xcoord, cell.ycoord
+                        break
+                    
+                    if n_opt < minimum:
+                        minimum = n_opt
+                        x, y = cell.xcoord, cell.ycoord
+        
+        print(f'Candidate found ({x}, {y})')
+        return x, y
     
     def _gen_grid(self):
         mat = np.zeros((self.height, self.width), dtype=Cell)
