@@ -13,7 +13,7 @@ LEFT = 'l'
 @dataclass
 class Joint:
     position: str
-    rotations: int
+    rotation_stage: int
     hash_val: str
     
     def is_connectable(self, joint):
@@ -49,7 +49,16 @@ class Tile():
         im = Image.fromarray(np.rot90(self.array, rotation_stage, axes=[1,0]))
         plt.imshow(im)
         return im
+    
+    def get_edges(self, rotation_stage):
+        subset = []
         
+        for joint in self.joints:
+            if joint.rotation_stage == rotation_stage:
+                subset.append(joint)
+        
+        return subset
+    
     def _calc_joints(self):
         rgb2hex = lambda x: '%02x%02x%02x' %(x[0],x[1],x[2])
         joints = []
@@ -81,6 +90,7 @@ class Tileset():
     
     def __init__(self, path):
         self.tiles = self._load_tiles(path)
+        self.all_edges = self._get_all_edges()
 
     def _load_tiles(self, path):
         tiles = {}
@@ -91,3 +101,12 @@ class Tileset():
             tiles[t] = Tile(t, arr)
             
         return tiles
+    
+    def _get_all_edges(self):
+        joints = []
+        
+        for tile in list(self.tiles.values()):
+            for joint in tile.joints:
+                joints.append({'tile':tile.name, 'joint':joint})
+                
+        return joints
