@@ -42,19 +42,20 @@ class Canvas():
         self.grid = self._gen_grid()
         
     def render(self):
-        #TODO: DAMN i can't figure out how to render this
-        # rended = np.zeros((8, 8, 4))
+        rended = np.zeros((self.width*8, self.height*8, 4), dtype=np.uint8)
         
-        # for i, row in enumerate(self.grid):
-        #     for j, cell in enumerate(row):
+        for i, row in enumerate(self.grid):
+            for j, cell in enumerate(row):
                 
-        #         rended[:8, :8] = self.tileset.tiles[cell.tile].array
-        #         print(cell)
-        
-        # print (rended)
-        # im = Image.fromarray(rended)
-        # plt.imshow(im)
-        # plt.show()
+                self.tileset.tiles[cell.tile].render()
+                arr = self.tileset.tiles[cell.tile].array
+                arr = np.rot90(arr, cell.n_rotations, axes=[1,0])
+                rended[i*8:i*8+8, j*8:j*8+8] = arr
+                
+        im = Image.fromarray(rended)
+        plt.imshow(im)
+        plt.show()
+        pass
         
     def is_finished(self):
         return self.finished
@@ -66,9 +67,11 @@ class Canvas():
         if cell.collapsed != True:
         
             choice = random.choice(cell.options)
+            print(choice)
                     
             cell.tile = choice['tile']
             cell.n_rotations = choice['joint'].rotation_stage
+            print(cell)
             cell.options = None
             self._propagate_collapse(cell)
             cell.collapsed = True
